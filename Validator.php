@@ -9,11 +9,31 @@ class Validator
     {
         $this->error_message = [];
 
-        // 名前
         if (empty($data['name'])) {
             $this->error_message['name'] = '名前が入力されていません';
         } elseif (mb_strlen($data['name']) > 20) {
             $this->error_message['name'] = '名前は20文字以内で入力してください';
+        } elseif (!preg_match('/^[\p{Han}\p{Hiragana}\p{Katakana}ー]+$/u', $data['name'])) {
+            $this->error_message['name'] = '名前には漢字・ひらがな・カタカナ以外の文字を含めないでください';
+        }
+
+        function validateName($name)
+        {
+            // 半角スペース・全角スペースを除去
+            $without_spaces = str_replace([' ', '　'], '', $name);
+
+            // 空文字チェック（スペースだけはNG）
+            if ($without_spaces === '') {
+                return false;
+            }
+
+            // 漢字・ひらがな・カタカナのみかどうかをチェック
+            // \p{Han}：漢字、\p{Hiragana}：ひらがな、\p{Katakana}：カタカナ
+            if (!preg_match('/^[\p{Han}\p{Hiragana}\p{Katakana}ー]+$/u', $name)) {
+                return false;
+            }
+
+            return true;
         }
 
         // ふりがな
@@ -31,7 +51,12 @@ class Validator
             $this->error_message['birth_date'] = '生年月日が入力されていません';
         } elseif (!$this->isValidDate($data['birth_year'] ?? '', $data['birth_month'] ?? '', $data['birth_day'] ?? '')) {
             $this->error_message['birth_date'] = '生年月日が正しくありません';
+        } elseif (strtotime($data['birth_year'] . '-' . $data['birth_month'] . '-' . $data['birth_day']) > time()) {
+            $this->error_message['birth_date'] = '未来の日付は入力できません';
         }
+
+
+
 
         // 郵便番号
         if (empty($data['postal_code'])) {
@@ -41,8 +66,12 @@ class Validator
         }
 
         // 住所
-        if (empty($data['prefecture']) || empty($data['city_town'])) {
-            $this->error_message['address'] = '住所(都道府県もしくは市区町村・番地)が入力されていません';
+        if (empty($data['prefecture']) && empty($data['city_town'])) {
+            $this->error_message['address'] = '住所が入力されていません';
+        } elseif (empty($data['prefecture'])) {
+            $this->error_message['address'] = '都道府県が入力されていません';
+        } elseif (empty($data['city_town'])) {
+            $this->error_message['address'] = '市区町村以下の住所が入力されていません';
         } elseif (mb_strlen($data['prefecture']) > 10) {
             $this->error_message['address'] = '都道府県は10文字以内で入力してください';
         } elseif (mb_strlen($data['city_town']) > 50 || mb_strlen($data['building']) > 50) {
@@ -53,11 +82,12 @@ class Validator
         if (empty($data['tel'])) {
             $this->error_message['tel'] = '電話番号が入力されていません';
         } elseif (
+            substr_count($data['tel'], '-') !== 2 ||
             !preg_match('/^0\d{1,4}-\d{1,4}-\d{3,4}$/', $data['tel'] ?? '') ||
             mb_strlen($data['tel']) < 12 ||
             mb_strlen($data['tel']) > 13
         ) {
-            $this->error_message['tel'] = '電話番号は12~13桁で正しく入力してください';
+            $this->error_message['tel'] = '電話番号はハイフン(-)を2つ含めて12~13桁で正しく入力してください';
         }
 
         // メールアドレス
