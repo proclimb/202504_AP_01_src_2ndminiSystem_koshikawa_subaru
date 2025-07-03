@@ -9,32 +9,18 @@ class Validator
     {
         $this->error_message = [];
 
-        if (empty($data['name'])) {
+
+        $without_spaces = str_replace([' ', '　'], '', $data['name']);
+
+        if (empty($data['name']) || $without_spaces === '') {
             $this->error_message['name'] = '名前が入力されていません';
         } elseif (mb_strlen($data['name']) > 20) {
             $this->error_message['name'] = '名前は20文字以内で入力してください';
-        } elseif (!preg_match('/^[\p{Han}\p{Hiragana}\p{Katakana}ー]+$/u', $data['name'])) {
+        } elseif (!preg_match('/^[\p{Han}\p{Hiragana}\p{Katakana}ー　 ]+$/u', $data['name'])) {
             $this->error_message['name'] = '名前には漢字・ひらがな・カタカナ以外の文字を含めないでください';
         }
 
-        function validateName($name)
-        {
-            // 半角スペース・全角スペースを除去
-            $without_spaces = str_replace([' ', '　'], '', $name);
 
-            // 空文字チェック（スペースだけはNG）
-            if ($without_spaces === '') {
-                return false;
-            }
-
-            // 漢字・ひらがな・カタカナのみかどうかをチェック
-            // \p{Han}：漢字、\p{Hiragana}：ひらがな、\p{Katakana}：カタカナ
-            if (!preg_match('/^[\p{Han}\p{Hiragana}\p{Katakana}ー]+$/u', $name)) {
-                return false;
-            }
-
-            return true;
-        }
 
         // ふりがな
         if (empty($data['kana'])) {
