@@ -10,9 +10,9 @@ class Validator
         $this->error_message = [];
 
 
-        $without_spaces = str_replace([' ', '　'], '', $data['name']);
+        $data['name'] = str_replace([' ', '　'], '', $data['name']);
 
-        if (empty($data['name']) || $without_spaces === '') {
+        if (empty($data['name']) || $data['name'] === '') {
             $this->error_message['name'] = '名前が入力されていません';
         } elseif (mb_strlen($data['name']) > 20) {
             $this->error_message['name'] = '名前は20文字以内で入力してください';
@@ -81,6 +81,22 @@ class Validator
             $this->error_message['email'] = 'メールアドレスが入力されていません';
         } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $this->error_message['email'] = '有効なメールアドレスを入力してください';
+        }
+        #88-103
+
+
+        if (!isset($_FILES['document1']) || $_FILES['document1']['error'] == UPLOAD_ERR_NO_FILE) {
+            $this->error_message['document1'] = '本人確認書類（表面）がアップロードされていません';
+        }
+        if (!isset($_FILES['document2']) || $_FILES['document2']['error'] == UPLOAD_ERR_NO_FILE) {
+            $this->error_message['document2'] = '本人確認書類（裏面）がアップロードされていません';
+        }
+        if (isset($_FILES['document1']) && $_FILES['document1']['error'] !== UPLOAD_ERR_OK) {
+            $this->error_message['document1'] = '本人確認書類（表面）のアップロードに失敗しました';
+        }
+
+        if (isset($_FILES['document2']) && $_FILES['document2']['error'] !== UPLOAD_ERR_OK) {
+            $this->error_message['document2'] = '本人確認書類（裏面）のアップロードに失敗しました';
         }
 
         return empty($this->error_message);

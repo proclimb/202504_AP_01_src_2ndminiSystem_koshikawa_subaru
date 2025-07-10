@@ -1,5 +1,8 @@
 <?php
 
+session_start();
+
+
 /**
  * 更新完了画面
  *
@@ -15,8 +18,7 @@
  * **   更新完了のメッセージを表示します
  */
 
-session_start();
-
+$data = $_SESSION['edit_data'];
 //  1.DB接続情報、クラス定義の読み込み
 require_once 'Db.php';
 require_once 'User.php';
@@ -24,24 +26,21 @@ require_once 'Address.php';
 require_once 'FileBlobHelper.php';
 
 // 2. 入力データ取得
-// 2-1. ユーザーデータ取得
-$id = $_POST['id'];
+$id = $data['id'];
 $userData = [
-    'name'         => $_POST['name'],
-    'kana'         => $_POST['kana'],
-    'gender_flag'  => $_POST['gender_flag'],
-    'tel'          => $_POST['tel'],
-    'email'        => $_POST['email'],
+    'name'         => $data['name'],
+    'kana'         => $data['kana'],
+    'gender_flag'  => $data['gender_flag'],
+    'tel'          => $data['tel'],
+    'email'        => $data['email'],
 ];
 
-
-// 2-2. 住所データも取得
 $addressData = [
     'user_id'      => $id,
-    'postal_code'  => $_POST['postal_code'],
-    'prefecture'   => $_POST['prefecture'],
-    'city_town'    => $_POST['city_town'],
-    'building'     => $_POST['building'],
+    'postal_code'  => $data['postal_code'],
+    'prefecture'   => $data['prefecture'],
+    'city_town'    => $data['city_town'],
+    'building'     => $data['building'],
 ];
 
 // 3. トランザクション開始
