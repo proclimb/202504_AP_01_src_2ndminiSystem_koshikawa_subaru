@@ -11,7 +11,7 @@ $old = $_POST ?? [];
 
 if (!empty($_POST)) {
     $validator = new Validator();
-    if ($validator->validate($_POST)) {
+    if ($validator->validate($_POST, $_FILES)) {
         $_SESSION['edit_data'] = $_POST;
         header('Location: update.php');
         exit();
@@ -133,7 +133,6 @@ session_destroy();
                 </div>
             </div>
 
-            //137-151
             <div>
                 <label for="document1">本人確認書類（表面）:</label>
                 <input type="file" name="document1" id="document1">

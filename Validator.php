@@ -5,7 +5,7 @@ class Validator
     private $error_message = [];
 
     // 呼び出し元で使う
-    public function validate($data)
+    public function validate($data, $files)
     {
         $this->error_message = [];
 
@@ -82,26 +82,27 @@ class Validator
         } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
             $this->error_message['email'] = '有効なメールアドレスを入力してください';
         }
-        #88-103
-
-
-        if (!isset($_FILES['document1']) || $_FILES['document1']['error'] == UPLOAD_ERR_NO_FILE) {
-            $this->error_message['document1'] = '本人確認書類（表面）がアップロードされていません';
-        }
-        if (!isset($_FILES['document2']) || $_FILES['document2']['error'] == UPLOAD_ERR_NO_FILE) {
-            $this->error_message['document2'] = '本人確認書類（裏面）がアップロードされていません';
-        }
-        if (isset($_FILES['document1']) && $_FILES['document1']['error'] !== UPLOAD_ERR_OK) {
-            $this->error_message['document1'] = '本人確認書類（表面）のアップロードに失敗しました';
+        //本人確認書類（表面）
+        if (!empty($files['document1']['name'])) {
+            if (!$this->isValidImage($files['document1']['type'])) {
+                $this->error_message['document1'] = 'ファイル形式は PNG または JPEG のみ許可されています';
+            }
         }
 
-        if (isset($_FILES['document2']) && $_FILES['document2']['error'] !== UPLOAD_ERR_OK) {
-            $this->error_message['document2'] = '本人確認書類（裏面）のアップロードに失敗しました';
+        // 本人確認書類（裏面）
+        if (!empty($files['document2']['name'])) {
+            if (!$this->isValidImage($files['document2']['type'])) {
+                $this->error_message['document2'] = 'ファイル形式は PNG または JPEG のみ許可されています';
+            }
         }
-
         return empty($this->error_message);
     }
 
+    //追加項目
+    private function isValidImage($mime_type)
+    {
+        return in_array($mime_type, ['image/png', 'image/jpeg']);
+    }
 
     // エラーメッセージ取得
     public function getErrors()
