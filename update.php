@@ -19,6 +19,7 @@ session_start();
  */
 
 $data = $_SESSION['edit_data'];
+$_FILES = $_SESSION['edit_files'];
 //  1.DB接続情報、クラス定義の読み込み
 require_once 'Db.php';
 require_once 'User.php';
@@ -56,8 +57,6 @@ try {
     $address = new UserAddress($pdo);
     $address->updateByUserId($addressData); // user_id付きのデータを渡す
 
-    // 6. ファイルアップロードを BLOB 化して取得（保存期限なし = null）
-    //    edit.php の <input type="file" name="document1"> / document2
     $blobs = FileBlobHelper::getMultipleBlobs(
         $_FILES['document1'] ?? null,
         $_FILES['document2'] ?? null

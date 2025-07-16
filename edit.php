@@ -13,6 +13,7 @@ if (!empty($_POST)) {
     $validator = new Validator();
     if ($validator->validate($_POST, $_FILES)) {
         $_SESSION['edit_data'] = $_POST;
+        $_SESSION['edit_files'] = $_FILES;
         header('Location: update.php');
         exit();
     } else {

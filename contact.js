@@ -35,7 +35,7 @@ function validate() {
         errorElement(document.edit.postal_code, "郵便番号が入力されていません");
         flag = false;
     } else if (!/^\d{3}-\d{4}$/.test(document.edit.postal_code.value)) {
-        errorElement(document.edit.postal_code, "郵便番号の形式が正しくありません（例: 123-4567）");
+        errorElement(document.edit.postal_code, "郵便番号は「000-0000」の形式で入力してください");
         flag = false;
     }
 
@@ -57,7 +57,7 @@ function validate() {
     } else {
         // 6-2.電話番号の長さをチェック
         if (!validateTel(document.edit.tel.value)) {
-            errorElement(document.edit.tel, "電話番号が違います");
+            errorElement(document.edit.tel, "電話番号はハイフン(-)を2つ含めて12~13桁で正しく入力してください");
             flag = false;
         }
     }
@@ -70,7 +70,7 @@ function validate() {
     } else {
         // 5-2.メールアドレスの形式をチェック
         if (!validateMail(document.edit.email.value)) {
-            errorElement(document.edit.email, "メールアドレスが正しくありません");
+            errorElement(document.edit.email, "有効なメールアドレスを入力してください");
             flag = false;
         }
     }

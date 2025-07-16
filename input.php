@@ -42,22 +42,31 @@ session_start();
 $error_message = [];
 $old = $_POST ?? [];
 
-// 3.入力項目の入力チェック
-if (!empty($_POST) && empty($_SESSION['input_data'])) {
+
+
+
+// 3. 入力項目のバリデーション
+if (!empty($_POST)) {
     $validator = new Validator();
 
-    if ($validator->validate($_POST)) {
+    // $_FILES を使う場合は第2引数を渡す（使わないなら省略でOK）
+    if ($validator->validate($old, $files)) {
+        // 入力値をセッションに保存
         $_SESSION['input_data'] = $_POST;
-        header('Location:confirm.php');
+
+        // 確認画面へリダイレクト
+        header('Location: confirm.php');
         exit();
     } else {
+        // バリデーションエラーを取得
         $error_message = $validator->getErrors();
     }
 }
 
 // 4.セッションを破棄する
-session_destroy();
-
+if (empty($_POST)) {
+    session_destroy();
+}
 // 5.html の描画
 // ** これ以降は、htmlの部分になります
 // ** php の部分は、入力した値を表示する時と入力エラー時のメッセージを表示する時に使用しています
