@@ -44,9 +44,8 @@ $old = $_POST ?? [];
 
 
 
-
 // 3. 入力項目のバリデーション
-if (!empty($_POST)) {
+if (!empty($_POST) && empty($_SESSION['input_data'])) {
     $validator = new Validator();
 
     // $_FILES を使う場合は第2引数を渡す（使わないなら省略でOK）
@@ -64,9 +63,7 @@ if (!empty($_POST)) {
 }
 
 // 4.セッションを破棄する
-if (empty($_POST)) {
-    session_destroy();
-}
+session_destroy();
 // 5.html の描画
 // ** これ以降は、htmlの部分になります
 // ** php の部分は、入力した値を表示する時と入力エラー時のメッセージを表示する時に使用しています
@@ -80,6 +77,7 @@ if (empty($_POST)) {
     <title>mini System</title>
     <link rel="stylesheet" href="style_new.css">
     <script src="postalcodesearch.js"></script>
+    <script src="contact.js"></script>
 </head>
 
 <body>
@@ -90,7 +88,7 @@ if (empty($_POST)) {
         <h2>登録画面</h2>
     </div>
     <div>
-        <form action="input.php" method="post" name="form">
+        <form action="input.php" method="post" name="form" enctype="multipart/form-data">
             <h1 class="contact-title">登録内容入力</h1>
             <p>登録内容をご入力の上、「確認画面へ」ボタンをクリックしてください。</p>
             <div>
@@ -99,6 +97,7 @@ if (empty($_POST)) {
                     <input
                         type="text"
                         name="name"
+                        id="name"
                         placeholder="例）山田太郎"
                         value="<?= htmlspecialchars($old['name']) ?>">
                     <?php if (isset($error_message['name'])) : ?>
@@ -147,7 +146,7 @@ if (empty($_POST)) {
                     <label>生年月日<span>必須</span></label>
                     <!-- 年プルダウン -->
                     <div class="birth-selects">
-                        <select name="birth_year" class="form-control">
+                        <select name="birth_year" id="birth_year" class="form-control">
                             <option value="">年</option>
                             <?php
                             $currentYear = (int)date('Y');
@@ -161,7 +160,7 @@ if (empty($_POST)) {
                         </select>
 
                         <!-- 月プルダウン -->
-                        <select name="birth_month" class="form-control">
+                        <select name="birth_month" id="birth_month" class="form-control">
                             <option value="">月</option>
                             <?php
                             for ($m = 1; $m <= 12; $m++) :
@@ -174,7 +173,7 @@ if (empty($_POST)) {
                         </select>
 
                         <!-- 日プルダウン -->
-                        <select name="birth_day" class="form-control">
+                        <select name="birth_day" id="birth_day" class="form-control">
                             <option value="">日</option>
                             <?php
                             for ($d = 1; $d <= 31; $d++) :
@@ -186,10 +185,11 @@ if (empty($_POST)) {
                             <?php endfor ?>
                         </select>
                     </div>
-                    <?php if (isset($error_message['birth_date'])) : ?>
-                        <div class="error-msg2">
-                            <?= htmlspecialchars($error_message['birth_date']) ?></div>
-                    <?php endif ?>
+                    <div class="error-msg2" id="birth_date_error">
+                        <?php if (isset($error_message['birth_date'])) {
+                            echo htmlspecialchars($error_message['birth_date']);
+                        } ?>
+                    </div>
                 </div>
                 <div>
                     <label>郵便番号<span>必須</span></label>
@@ -233,12 +233,18 @@ if (empty($_POST)) {
                         <div class="error-msg">
                             <?= htmlspecialchars($error_message['address']) ?></div>
                     <?php endif ?>
+                    <div class="error-msg" id="address_error">
+                        <?php if (isset($error_message['address'])) : ?>
+                            <?= htmlspecialchars($error_message['address']) ?>
+                        <?php endif ?>
+                    </div>
                 </div>
                 <div>
                     <label>電話番号<span>必須</span></label>
                     <input
                         type="text"
                         name="tel"
+                        id="tel"
                         placeholder="例）000-000-0000"
                         value="<?= htmlspecialchars($old['tel']) ?>">
                     <?php if (isset($error_message['tel'])) : ?>
@@ -251,12 +257,29 @@ if (empty($_POST)) {
                     <input
                         type="text"
                         name="email"
+                        id="email"
                         placeholder="例）guest@example.com"
                         value="<?= htmlspecialchars($old['email']) ?>">
                     <?php if (isset($error_message['email'])) : ?>
                         <div class="error-msg">
                             <?= htmlspecialchars($error_message['email']) ?></div>
                     <?php endif ?>
+                </div>
+
+                <div>
+                    <label for="document1">本人確認書類（表面）:</label>
+                    <input type="file" name="document1" id="document1">
+                    <?php if (!empty($error_message['document1'])): ?>
+                        <p class="error"><?= htmlspecialchars($error_message['document1']) ?></p>
+                    <?php endif; ?>
+                </div>
+
+                <div>
+                    <label for="document2">本人確認書類（裏面）:</label>
+                    <input type="file" name="document2" id="document2">
+                    <?php if (!empty($error_message['document2'])): ?>
+                        <p class="error"><?= htmlspecialchars($error_message['document2']) ?></p>
+                    <?php endif; ?>
                 </div>
             </div>
             <button type="submit">確認画面へ</button>
@@ -265,6 +288,10 @@ if (empty($_POST)) {
             </a>
         </form>
     </div>
+
+    <script src="contact.js"></script>
+
+    <script src="contact.js?20250806"></script>
 </body>
 
 </html>
