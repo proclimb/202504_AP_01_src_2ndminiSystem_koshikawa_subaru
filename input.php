@@ -210,6 +210,8 @@ session_destroy();
                             <?= htmlspecialchars($error_message['postal_code']) ?></div>
                     <?php endif ?>
                 </div>
+
+
                 <div>
                     <label>住所<span>必須</span></label>
                     <input

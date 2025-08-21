@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('prefecture').value = data.prefecture;
                     document.getElementById('city_town').value = data.city_town;
                 } else {
-                    alert('該当する住所が見つかりません');
+                    alert('該当する住所を入力します');
                 }
             })
             //             .then(response => response.json())

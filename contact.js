@@ -178,6 +178,43 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
-});
 
-// 既存のvalidateMail, validateTel, validateKana関数はそのまま利用できます
+    // 住所バリデーション
+    const searchBtn = document.getElementById('searchAddressBtn'); // ★ここで searchBtn が作られる
+    const prefectureInput = document.getElementById('prefecture');
+    const cityTownInput = document.getElementById('city_town');
+
+    if (searchBtn && postalInput && prefectureInput && cityTownInput) {
+        searchBtn.addEventListener('click', () => {
+            const postal = postalInput.value.replace('-', '');
+            const postalCodeInput = document.getElementById('postal-code');
+            if (!/^\d{7}$/.test(postal)) {
+                alert('郵便番号は7桁で入力してください');
+                return;
+            }
+            fetch(`https://zipcloud.ibsnet.co.jp/api/search?zipcode=${postal}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    if (data.status !== 200) {
+                        alert(data.message || '住所検索に失敗しました');
+                        return;
+                    }
+                    if (data.results && data.results.length > 0) {
+                        const result = data.results[0];
+                        const pref = result.address1 || '';
+                        const city = (result.address2 || '') + (result.address3 || '');
+                        // どちらか一方でも取得できていれば自動入力
+                        if (pref || city) {
+                            prefectureInput.value = pref;
+                            cityTownInput.value = city;
+                        } else {
+                            alert('該当する住所が見つかりました');
+                        }
+                    } else {
+                        alert('該当する住所が見つかりませんでした');
+                    }
+                });
+        });
+    }
+});
